@@ -1,0 +1,96 @@
+<html>
+<head>
+	<title>EITP LED Switch System</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script>
+
+client = new Paho.MQTT.Client("127.0.0.1",Number(8081),"eitp-lesson");
+        client.connect({onSuccess:onConnect});//连接服务器并注册连接成功处理事件
+        function onConnect() {
+	        console.log("onConnected");
+	        client.subscribe("/eitp1");//订阅主题
+			        //发送消息
+        /*message = new Paho.MQTT.Message("Ben Siu1");
+		message.destinationName = "/eitp-1";
+        message.qos = 1;
+        message.retained = false;
+		client.send(message);*/
+		console.log("a");
+        }
+        client.onConnectionLost = onConnectionLost;//注册连接断开处理事件
+        client.onMessageArrived = onMessageArrived;//注册消息接收处理事件
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:"+responseObject.errorMessage);
+                console.log("Disconnected");
+             }
+        }
+        function onMessageArrived(message) {
+			console.log("收到消息:"+JSON.stringify(message));
+		  console.log("收到消息:"+message.payloadString);
+		}
+		function onClick(text){
+			//var text = document.getElementById("message").value;
+	        message = new Paho.MQTT.Message(text);
+			message.destinationName = "/eitp1";
+	        message.qos = 1;
+	        message.retained = false;
+			client.send(message);
+		}
+
+
+</script>
+</head>
+
+<body>
+	<div class="row">
+		<div class="col-md-8">
+			<img src="school_logo.png" width="180" height="200">
+			<h3>TKPSS Smart Home Device System</h3>
+
+		  <table class="table">
+		    <tr>
+		      <th>Item</th>
+		      <th></th>
+		    </tr>
+		    <tr>
+		      <td>Light (RED Light)</td>
+		      <td><input id="myCheckbox" type="checkbox" checked data-toggle="toggle" data-onstyle="primary" onclick="calc()" ></td>
+		    </tr>
+		    <tr>
+		      <td>Light (GREEN Light)</td>
+		      <td><input type="checkbox" checked data-toggle="toggle" data-onstyle="primary"></td>
+		    </tr>
+		    <tr>
+		     <td>Light (BLUE Light)</td>
+		     <td><input type="checkbox" checked data-toggle="toggle" data-onstyle="primary"></td>
+		    </tr>
+		  </table>
+
+		
+		
+		
+		</div>
+		
+	</div>
+	<script>
+		$('#myCheckbox').bootstrapToggle({
+		    onstyle:'success'
+		}).change(function(){
+			var checked = $(this).prop('checked');
+		   	if (checked)
+				onClick("on");
+			else
+				onClick("off");
+		   
+		   
+		});
+	</script>
+</body>
+</html>
